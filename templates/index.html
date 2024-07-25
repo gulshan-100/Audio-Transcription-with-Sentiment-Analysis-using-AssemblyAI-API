@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Sentiment Analysis</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <h1>Video Sentiment Analysis and Transcription Tool</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".mp4,.avi,.mov,.wmv">
+        <input type="submit" value="Upload and Analyze">
+    </form>
+    <div id="results"></div>
+
+    <script>
+    $(function() {
+        $('#upload-form').submit(function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            $.ajax({
+                url: '/',
+                type: 'POST',
+                data: formData,
+                success: function(data) {
+                    if (data.error) {
+                        $('#results').html('<p>Error: ' + data.error + '</p>');
+                    } else {
+                        var resultsHtml = '<h2>Sentiment Analysis Results:</h2>';
+                        data.results.forEach(function(result) {
+                            resultsHtml += '<p>Text: ' + result.text + '</p>';
+                            resultsHtml += '<p>Sentiment: ' + result.sentiment + '</p>';
+                            resultsHtml += '<p>Time: ' + (result.start/1000).toFixed(2) + 's - ' + (result.end/1000).toFixed(2) + 's</p>';
+                            resultsHtml += '<hr>';
+                        });
+                        $('#results').html(resultsHtml);
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+    });
+    </script>
+</body>
+</html>
